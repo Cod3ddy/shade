@@ -51,3 +51,38 @@ func CleanFile(path string) error {
 
 	return nil
 }
+
+
+
+// List Down log lines that were found
+
+
+func LogLines(path string) ([]string, error){
+	f, err := os.Open(path)
+	if err != nil{
+		return nil, err
+	}
+
+	defer f.Close()
+
+	var lines [] string
+
+	scanner := bufio.NewScanner(f)
+	reg := regexp.MustCompile(`fmt\.Printf\(`)
+
+	for scanner.Scan(){
+		line := scanner.Text()
+
+		if reg.MatchString(line){
+			lines = append(lines, line)
+		}
+	}
+
+	// choices := []string{"Hey", "Hi", "Joel"}
+
+	if err := scanner.Err(); err != nil{
+		return nil, err 
+	}
+
+	return lines, nil
+}
