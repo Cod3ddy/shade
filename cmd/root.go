@@ -4,10 +4,12 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/cod3ddy/shade/pkg/lib"
 	"github.com/spf13/cobra"
 )
@@ -35,10 +37,16 @@ var rootCmd = &cobra.Command{
 				}
 
 				if filepath.Ext(path) == ".go" {
-					err := lib.CleanFile(path)
+					lines, err := lib.LogLines(path)
 					if err != nil {
 						log.Printf("Error cleaning file %s: %v", path, err)
 					}
+
+					// for  _, line := range lines{
+					// 	fmt.Printf("lines: %s\n", strings.TrimSpace(line))
+					// }
+
+					TeaInit(lines)
 				}
 				return nil
 			})
@@ -48,16 +56,17 @@ var rootCmd = &cobra.Command{
 			}
 
 		}else{
-			err := lib.CleanFile(targetFile)
+			lines, err := lib.LogLines(targetFile)
 			if err != nil {
 				log.Fatalf("Error cleaning file: %v", err)
+			}
+
+			for  _, line := range lines{
+				fmt.Printf("lines: %s\n", line)
 			}
 		}
 
 	},
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -74,6 +83,16 @@ func init() {
 	rootCmd.Flags().StringVarP(&targetFile, "file", "f", "", "Specific Go file to process")
 	
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+
+func TeaInit(choices []string){
+	program := tea.NewProgram(lib.InitialModel(choices))
+
+	if _, err := program.Run(); err != nil{
+		fmt.Printf("errors: %v", err)
+		os.Exit(1)
+	}
 }
 
 
