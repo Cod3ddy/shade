@@ -2,6 +2,8 @@ package lib
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -28,9 +30,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 	switch msg := msg.(type){
 	case tea.KeyMsg:
 		switch msg.String(){
-		case "ctr+c", "q":
-			return m, tea.Quit
-
+		case "ctrl+c","q":
+			os.Exit(0)
 		case "up":
 			if m.cursor > 0{
 				m.cursor--
@@ -58,7 +59,7 @@ func (m model) View() string{
 
 	// header
 
-	s := "Select which Log line to remove use  upArrow, downArrow and ENTER"
+	s := "Select which Log line to remove use  upArrow, downArrow and ENTER\n\n"
 
 	for i, choice := range m.choices{
 		cursor := " "
@@ -74,7 +75,7 @@ func (m model) View() string{
 		}
 
 
-		s += fmt.Sprintf("%s [%s] %s", cursor, checked, choice)
+		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, strings.TrimSpace(choice))
 		
 	}
 
